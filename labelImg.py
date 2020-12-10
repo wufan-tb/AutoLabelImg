@@ -1596,7 +1596,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 return
             key_word = '' if key_word == '' else key_word+'_'
             for item in filelist:
-                if item.endswith('.jpg'):
+                if item.endswith('.jpg') or item.endswith('.jpeg'):
                     filepath=os.path.join(os.path.abspath(path), item)
                     if Fill > 1:
                         new_item='{}{}.jpg'.format(key_word,str(index).zfill(Fill))
@@ -2108,7 +2108,7 @@ class MainWindow(QMainWindow, WindowMixin):
         if self.filePath==None:
             QMessageBox.information(self,u'Wrong!',u'have no loaded folder yet, please check again.')
             return
-        try:       
+        if 1:       
             from keras_retinanet import models
             from keras_retinanet.utils.image import preprocess_image, resize_image
             from keras_retinanet.utils.visualization import remove_certain_label,transform_box
@@ -2219,7 +2219,7 @@ class MainWindow(QMainWindow, WindowMixin):
                         #!!!这块没直接append(new_obj)是因为当增加多个节点的话，new_obj会进行覆盖，必须要用深度复制以进行区分
                 tree.write(xml_path+'/'+image_names[i][0:-4]+'.xml')
             QMessageBox.information(self,u'Done!',u'auto labeling done, please reload img folder')
-        except:
+        #except:
             QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
         
     def data_auto_agument(self):
