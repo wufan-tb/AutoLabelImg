@@ -1,0 +1,26 @@
+<annotation>
+	<folder>img</folder>
+	<filename>bclj_137.jpg</filename>
+	<path>D:\_Learning\_mycode\VOC_Data\img\bclj_137.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>2560</width>
+		<height>1440</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>person</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>780</xmin>
+			<ymin>266</ymin>
+			<xmax>898</xmax>
+			<ymax>620</ymax>
+		</bndbox>
+	</object>
+</annotation>

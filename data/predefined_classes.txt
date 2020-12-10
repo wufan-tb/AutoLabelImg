@@ -1,0 +1,8 @@
+sedan
+suv
+van
+bus
+microbus
+truck
+motorbike
+bicycle

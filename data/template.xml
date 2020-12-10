@@ -1,0 +1,14 @@
+<annotation>
+	<folder>img</folder>
+	<filename>bclj_137.jpg</filename>
+	<path>D:\_Learning\_mycode\VOC_Data\img\bclj_137.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>2560</width>
+		<height>1440</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	</annotation>
