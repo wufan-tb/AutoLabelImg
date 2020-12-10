@@ -49,6 +49,6 @@ def setup_gpu(gpu_id):
 
         os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu_id)
         config = tf.ConfigProto()
-        config.gpu_options.per_process_gpu_memory_fraction = 0.1
+        config.gpu_options.per_process_gpu_memory_fraction = 0.4
         config.gpu_options.allow_growth = True
         tf.keras.backend.set_session(tf.Session(config=config))
