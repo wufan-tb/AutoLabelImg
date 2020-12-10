@@ -123,8 +123,9 @@ class Canvas(QWidget):
 
         # Update coordinates in status bar if image is opened
         window = self.parent().window()
-        img=self.get_mouse_img()
-        window.new_test.setPixmap(img)
+        # img=self.get_mouse_img()
+        # window.new_test.setPixmap(img)  #注释这两行取消放大功能
+        
         if window.filePath is not None:
             self.parent().window().labelCoordinates.setText(
                 'X: %d; Y: %d' % (pos.x(), pos.y()))
