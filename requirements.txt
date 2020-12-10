@@ -4,3 +4,4 @@ keras
 natsort
 cv2
 numpy
+pyautogui
