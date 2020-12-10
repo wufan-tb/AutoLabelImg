@@ -1,2 +1,6 @@
-pyqt5==5.10.1
-lxml==4.2.4
+pyqt5
+lxml
+keras
+natsort
+cv2
+numpy
