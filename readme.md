@@ -2,7 +2,7 @@
 
 ### 在labelImg的基础上，增加了多种批量处理的工具，同时增加了查询系统，对于新加的功能可以查询获得说明和使用方式。
 
-#### 原版软件参见：[labelImg](https://github.com/tzutalin/labelImg)，参考他的编译过程
+#### 原版软件参见：[labelImg](https://github.com/tzutalin/labelImg)，仓库下载好后，如不能直接运行，参考他的安装和编译过程
 
 ### 一些功能说明示意图：
 
