@@ -37,8 +37,8 @@
 一些示意图，具体说明可参考软件中的查询系统：
 
 ##### 查询系统：
-![查询](https://github.com/wufan-tb/improved-LabelImg/blob/master/demo/0.jpg)
+![查询](demo/0.jpg)
 ##### 标注工具:
-![标注](https://github.com/wufan-tb/improved-LabelImg/blob/master/demo/1.jpg)
+![标注](demo/1.jpg)
 ##### 视频工具:
-![视频](https://github.com/wufan-tb/improved-LabelImg/blob/master/demo/2.jpg)
+![视频](demo/2.jpg)
