@@ -25,6 +25,7 @@
 4. 可选步骤，Retinanet编译：<Br>
 `cd keras_retinanet` <Br>
 `python setup.py build_ext --inplace` <Br>
+`cd ..` <Br>
 参考[keras-retinanet](https://github.com/fizyr/keras-retinanet)
 
 5. 可选步骤，Yolov5安装：<Br>
