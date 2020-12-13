@@ -33,7 +33,7 @@
 `mv {your_model_weight.pt} pytorch_yolov5/weights/` <Br>
 官方模型获取参考[Yolov5](https://github.com/ultralytics/yolov5)
 
-6. 安装完成后，输入  `python labelImg.py` 打开软件开始标注。
+6. 完成1,2,3步骤后，输入  `python labelImg.py` 打开软件开始标注。
 
 * 其中4，5步骤并非必须，若要使用自动标注工具则需要进行<Br>
 
