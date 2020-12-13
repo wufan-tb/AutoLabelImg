@@ -30,15 +30,17 @@
 5. 可选步骤，Yolov5安装：<Br>
 参考[Yolov5](https://github.com/ultralytics/yolov5)
 
-其中4，5步骤并非必须，若要使用自动标注工具则需要进行
+6. 安装完成后，输入  `python labelImg.py` 打开软件开始标注。
+
+* 其中4，5步骤并非必须，若要使用自动标注工具则需要进行<Br>
 
 ### Demo:
 
 一些示意图，具体说明可参考软件中的查询系统：
 
 ##### 查询系统：
-![查询](https://github.com/wufan-tb/improved-LabelImg/blob/master/demo/0.jpg)
+![查询](demo/0.jpg)
 ##### 标注工具:
-![标注](https://github.com/wufan-tb/improved-LabelImg/blob/master/demo/1.jpg)
+![标注](demo/1.jpg)
 ##### 视频工具:
-![视频](https://github.com/wufan-tb/improved-LabelImg/blob/master/demo/2.jpg)
+![视频](demo/2.jpg)
