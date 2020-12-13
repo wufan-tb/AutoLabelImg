@@ -26,10 +26,12 @@
 `cd keras_retinanet` <Br>
 `python setup.py build_ext --inplace` <Br>
 `cd ..` <Br>
-参考[keras-retinanet](https://github.com/fizyr/keras-retinanet)
+`mv {your_model_weight.h5} keras_retinanet/weights/` <Br>
+编译过程可参考[keras-retinanet](https://github.com/fizyr/keras-retinanet), 官方模型也可以在里面下载
 
-5. 可选步骤，Yolov5安装：<Br>
-参考[Yolov5](https://github.com/ultralytics/yolov5)
+5. 可选步骤，准备Yolov5模型：<Br>
+`mv {your_model_weight.pt} pytorch_yolov5/weights/` <Br>
+官方模型获取参考[Yolov5](https://github.com/ultralytics/yolov5)
 
 6. 安装完成后，输入  `python labelImg.py` 打开软件开始标注。
 

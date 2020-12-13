@@ -11,6 +11,11 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+sys.path.append('pytorch_yolov5/')
+from models.experimental import *
+from utils.datasets import *
+from utils.utils import *
+
 from combobox import ComboBox
 from libs.resources import *
 from libs.constants import *
@@ -2116,19 +2121,165 @@ class MainWindow(QMainWindow, WindowMixin):
             QMessageBox.information(self,u"Done!",u"fix xml's property done!")
         except:
             QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
+     
+    def yolov5_auto_labeling(self):
+        try:
+            tree = ET.ElementTree(file='./data/origin.xml')
+            root=tree.getroot()
+            for child in root.findall('object'):
+                template_obj=child#保存一个物体的样板
+                root.remove(child)
+            tree.write('./data/template.xml')
+            #=====def some function=====
+            def change_obj_property(detect_result,template_obj):
+                temp_obj=template_obj
+                for child in temp_obj:
+                    key=child.tag
+                    if key in detect_result.keys():
+                        child.text=detect_result[key]
+                    if key=='bndbox':
+                        for gchild in child:
+                            gkey=gchild.tag
+                            gchild.text=str(detect_result[gkey])
+                return temp_obj
                 
+            def change_result_type_yolov5(boxes,scores,labels):
+                result=[]
+                for box, score, label in zip(boxes, scores, labels):
+                    if score>0.3:
+                        try:
+                            new_obj={}
+                            new_obj['name']=label
+                            new_obj['xmin']=int(box[0])
+                            new_obj['ymin']=int(box[1])
+                            new_obj['xmax']=int(box[2])
+                            new_obj['ymax']=int(box[3])
+                            result.append(new_obj)
+                        except:
+                            print('labels_info have no label: '+str(label))
+                            pass
+                return result
+
+            source=os.path.dirname(self.filePath)
+            xml_path=self.defaultSaveDir
+            
+            weight_path='pytorch_yolov5/weights'
+            weight_list=[]
+            for item in sorted(os.listdir(weight_path)):
+                if item.endswith('.h5') or item.endswith('.pt') or item.endswith('.pth'):
+                    weight_list.append(item)
+            items = tuple(weight_list)
+            if len(weight_list)>0 :
+                weights, ok = QInputDialog.getItem(self, "Select",
+                "Model weights file(weights file should under 'pytorch_yolov5/weights'):", items, 0, False)
+                if not ok:
+                    return
+                else:
+                    weights=os.path.join(weight_path,weights)
+            else:
+                weights,_ = QFileDialog.getOpenFileName(self,"'pytorch_yolov5/weights' is empty, choose model weights file:")
+                if not (weights.endswith('.h5') or weights.endswith('.pt') or weights.endswith('.pth')):
+                    QMessageBox.information(self,u'Wrong!',u'weights file must endswith .h5 or .pt or .pth')
+                    return
+            imgsz,OK=QInputDialog.getInt(self,'Integer input dialog','input img size(k*32):',value=320)
+            if not OK:
+                return
+            conf_thres=0.5
+            iou_thres=0.5
+            # Initialize
+            device = torch_utils.select_device('')
+            half = device.type != 'cpu'  # half precision only supported on CUDA
+
+            # Load model
+            model = attempt_load(weights, map_location=device)  # load FP32 model
+            imgsz = check_img_size(imgsz, s=model.stride.max())  # check img_size
+            if half:
+                model.half()  # to FP16
+            dataset = LoadImages(source, img_size=imgsz)
+
+            # Get names and colors
+            names = model.module.names if hasattr(model, 'module') else model.names
+
+            # Run inference
+            t0 = time.time()
+            img = torch.zeros((1, 3, imgsz, imgsz), device=device)  # init img
+            _ = model(img.half() if half else img) if device.type != 'cpu' else None  # run once
+            for path, img, im0s, vid_cap in dataset:
+                img = torch.from_numpy(img).to(device)
+                img = img.half() if half else img.float()  # uint8 to fp16/32
+                img /= 255.0  # 0 - 255 to 0.0 - 1.0
+                if img.ndimension() == 3:
+                    img = img.unsqueeze(0)
+
+                # Inference
+                t1 = torch_utils.time_synchronized()
+                pred = model(img, augment=False)[0]
+
+                # Apply NMS
+                pred = non_max_suppression(pred, conf_thres, iou_thres, classes=None, agnostic=False)
+                t2 = torch_utils.time_synchronized()
+
+                # Process detections
+                for i, det in enumerate(pred):  # detections per image
+                    p, s, im0 = path, '', im0s
+                    s += '%gx%g ' % img.shape[2:]  # print string
+                    gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
+                    labels=[]
+                    scores=[]
+                    boxes=[]
+                    if det is not None and len(det):
+                        # Rescale boxes from img_size to im0 size
+                        det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
+                        # Print results
+                        for c in det[:, -1].unique():
+                            n = (det[:, -1] == c).sum()  # detections per class
+                            s += '%g %ss, ' % (n, names[int(c)])  # add to string
+                        # Write results
+                        for *xyxy, conf, cls in det:
+                            labels.append(names[int(cls)])
+                            scores.append(conf.item())
+                            boxes.append([int(xyxy[0].item()),int(xyxy[1].item()),int(xyxy[2].item()),int(xyxy[3].item())])
+                    tree = ET.ElementTree(file='./data/template.xml')
+                    root=tree.getroot()
+                    common_property={'filename':path.split('\\')[-1],'path':source,'folder':'JPEGImages'}
+                    for child in root:
+                        key=child.tag
+                        if key in common_property.keys():
+                            child.text=common_property[key]
+                    result=change_result_type_yolov5(boxes,scores,labels)
+                    if len(result)>0:
+                        for j in range(len(result)):
+                            new_obj=change_obj_property(result[j],template_obj)
+                            root.append(deepcopy(new_obj))       #深度复制
+                            #!!!这块没直接append(new_obj)是因为当增加多个节点的话，new_obj会进行覆盖，必须要用深度复制以进行区分
+                    tree.write(xml_path+'/'+path.split('\\')[-1][0:-4]+'.xml')
+            QMessageBox.information(self,u'Done!',u'auto labeling done, please reload img folder')  
+        except:
+            QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
+                 
     def auto_labeling(self):
         """use model to labeling unannotated imgs.
         you should choose model type as well as model weights file and input label name.
         supported model type is 'Yolov5' or 'Retinanet', more type will updating later.
         'label name' must sorted by class number, if you do not remenber them, just press 'Enter', 
         box will named by its class number and you can change them one by one using action <change_label>
+        for a recorde, yolov5 do not need 'label name', but 'img size' additionally.
         this action may take some time, please don't click mouse too frequently.
         """
         if self.filePath==None:
             QMessageBox.information(self,u'Wrong!',u'have no loaded folder yet, please check again.')
             return
         try:       
+            #=====choose model and input label name=====
+            items = ("Yolov5","Retinanet")
+            model_type, ok = QInputDialog.getItem(self, "Select","Model type:", items, 0, False)
+            if not ok:
+                return
+            if model_type=="Yolov5":
+                with torch.no_grad():
+                    self.yolov5_auto_labeling()
+                return
+                    
             from keras_retinanet import models
             from keras_retinanet.utils.image import preprocess_image, resize_image
             from keras_retinanet.utils.visualization import remove_certain_label,transform_box
@@ -2136,17 +2287,26 @@ class MainWindow(QMainWindow, WindowMixin):
             setup_gpu(0)
             img_path = os.path.dirname(self.filePath)
             xml_path = self.defaultSaveDir
-            #=====choose model and input label name=====
-            items = ("Yolov5","Retinanet")
-            model_type, ok = QInputDialog.getItem(self, "Select","Model type:", items, 0, False)
-            if not ok:
-                return
-            model_path,_ = QFileDialog.getOpenFileName(self,'choose model weights file:')
-            if not model_path:
-                return
-            if not (model_path.endswith('.h5') or model_path.endswith('.pt') or model_path.endswith('.pth')):
-                QMessageBox.information(self,u'Wrong!',u'weights file must endswith .h5 or .pt or .pth')
-                return
+            weight_path='keras_retinanet/weights'
+            weight_list=[]
+            for item in sorted(os.listdir(weight_path)):
+                if item.endswith('.h5') or item.endswith('.pt') or item.endswith('.pth'):
+                    weight_list.append(item)
+            items = tuple(weight_list)
+            if len(weight_list)>0 :
+                model_path, ok = QInputDialog.getItem(self, "Select",
+                "Model weights file(weights file should under 'keras_retinanet/weights'):", items, 0, False)
+                if not ok:
+                    return
+                else:
+                    model_path=os.path.join(weight_path,model_path)
+            else:
+                model_path,_ = QFileDialog.getOpenFileName(self,"'keras_retinanet/weights' is empty, choose model weights file:")
+                if not model_path:
+                    return
+                if not (model_path.endswith('.h5') or model_path.endswith('.pt') or model_path.endswith('.pth')):
+                    QMessageBox.information(self,u'Wrong!',u'weights file must endswith .h5 or .pt or .pth')
+                    return
             model = models.load_model(model_path, backbone_name='resnet50')
             draw_info={}
             draw_info['label_name']={}
@@ -2185,7 +2345,7 @@ class MainWindow(QMainWindow, WindowMixin):
             def change_result_type(boxes,scores,labels):
                 result=[]
                 for box, score, label in zip(boxes, scores, labels):
-                    if score>0.3:
+                    if score>0.5:
                         try:
                             new_obj={}
                             name=draw_info['label_name'][label] if label in draw_info['label_name'].keys() else str(label)
@@ -2228,10 +2388,7 @@ class MainWindow(QMainWindow, WindowMixin):
                     if key in common_property.keys():
                         child.text=common_property[key]
                 img = cv2.imread(img_path + '/' + image_names[i])
-                if model_type=='Retinanet':
-                    labels,scores,boxes=retina_detect(img,[411,700])
-                elif model_type=='Yolov5':
-                    labels,scores,boxes=retina_detect(img,[411,700])
+                labels,scores,boxes=retina_detect(img,[411,700])
                 result=change_result_type(boxes,scores,labels)
                 if len(result)>0:
                     for j in range(len(result)):
