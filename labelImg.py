@@ -3,6 +3,7 @@
 import codecs,os,sys,platform,subprocess,random,natsort,datetime,cv2
 import xml.etree.ElementTree as ET
 from copy import deepcopy
+from strsimpy.jaro_winkler import JaroWinkler
 import numpy as np
 from skimage import exposure
 from functools import partial
@@ -1537,6 +1538,18 @@ class MainWindow(QMainWindow, WindowMixin):
         for example, input 'rename_img_xml' or 'ca1' can read actions <rename_img_xml>'s instruction.
         key_word must be actions in menu bar or its shorcut key for now, more intelligent system will update lately. 
         """
+        def find_max_similarity(test_str,str_list,threshold=0.7):
+            jarowinkler = JaroWinkler()
+            max_simi=threshold
+            max_str=None
+            for string in str_list:
+                simi=jarowinkler.similarity(test_str, string)
+                if simi > max_simi:
+                    max_str=string
+                    max_simi = simi
+                    
+            return max_str
+            
         search_key, ok=QInputDialog.getText(self, 'Text Input Dialog', 
                     "Input your search key word：\n(input nothing for search-system's own instruction)")
         if (not ok):
@@ -1565,8 +1578,15 @@ class MainWindow(QMainWindow, WindowMixin):
             search_info=search_info.replace('  ','')
             QMessageBox.information(self,u'Info!',search_info)
         else:
-            QMessageBox.information(self,u'Sorry!',
-                u'unkown key word, key word must in actions in menu bar or its shotcut key, please try again.')
+            vague_key=find_max_similarity(search_key,action_dict.keys())
+            if vague_key in action_dict.keys():
+                search_info=action_dict[vague_key].__doc__
+                search_info=search_info.replace('  ','')
+                search_info="here is info about '{}' based on your input: '{}'\n\n".format(vague_key,search_key)+search_info
+                QMessageBox.information(self,u'Info!',search_info)
+            else:
+                QMessageBox.information(self,u'Sorry!',
+                u'unkown key word, key word must in(or similar to) actions in menu bar or its shotcut key, please try again.')
         
     def batch_rename_img(self):
         """batch rename img name. 
