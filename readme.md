@@ -42,8 +42,8 @@
 一些示意图，具体说明可参考软件中的查询系统：
 
 ##### 查询系统：
-![查询](demo/0.jpg)
+![search_system](demo/0.jpg)
 ##### 标注工具:
-![标注](demo/1.jpg)
+![annotation](demo/1.jpg)
 ##### 视频工具:
-![视频](demo/2.jpg)
+![video](demo/2.jpg)
