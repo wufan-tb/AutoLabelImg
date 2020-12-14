@@ -2199,7 +2199,6 @@ class MainWindow(QMainWindow, WindowMixin):
 
             # Get names and colors
             names = model.module.names if hasattr(model, 'module') else model.names
-
             # Run inference
             t0 = time.time()
             img = torch.zeros((1, 3, imgsz, imgsz), device=device)  # init img
@@ -2252,7 +2251,7 @@ class MainWindow(QMainWindow, WindowMixin):
                             new_obj=change_obj_property(result[j],template_obj)
                             root.append(deepcopy(new_obj))       #深度复制
                             #!!!这块没直接append(new_obj)是因为当增加多个节点的话，new_obj会进行覆盖，必须要用深度复制以进行区分
-                    tree.write(xml_path+'/'+path.split('\\')[-1][0:-4]+'.xml')
+                    tree.write(os.path.join(xml_path,path[len(os.path.dirname(path))+1:-4]+'.xml'))
             QMessageBox.information(self,u'Done!',u'auto labeling done, please reload img folder')  
         except:
             QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
