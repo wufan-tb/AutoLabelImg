@@ -2,6 +2,7 @@ pyqt5
 lxml
 keras
 natsort
-cv2
+opencv-python
 numpy
 pyautogui
+strsimpy
