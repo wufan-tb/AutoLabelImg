@@ -1936,6 +1936,7 @@ class MainWindow(QMainWindow, WindowMixin):
                         continue
                     cv2.imwrite(save_path+str(int(cap.get(1)))+'.jpg',frame)
                 else:
+                    QMessageBox.information(self,u'Wrong!',u'extract failed.')
                     break
             cap.release()
             QMessageBox.information(self,u'Done!',u'video extract done.')
