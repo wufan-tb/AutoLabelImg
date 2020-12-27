@@ -22,3 +22,4 @@ cscope*
 *.pt
 *.pth
 *.git
+temp*

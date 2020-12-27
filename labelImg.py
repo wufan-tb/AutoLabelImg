@@ -220,6 +220,7 @@ class MainWindow(QMainWindow, WindowMixin):
         extract_stream=action('extract_stream', self.extract_stream,'Shift+2', 'new')
         batch_resize_img=action('batch_resize_img', self.batch_resize_img,'Shift+3', 'fit-window')
         merge_video=action('merge_video', self.merge_video,'Shift+4', 'open')
+        annotation_video=action('annotation_video', self.annotation_video,'Shift+5', 'new')
         
         quit = action(getStr('quit'), self.close,
                       'Ctrl+Q', 'quit', getStr('quitApp'))
@@ -402,7 +403,7 @@ class MainWindow(QMainWindow, WindowMixin):
                     label_pruning,file_pruning,change_label,fix_property,None,
                     auto_labeling,data_agument,None,
                     folder_info,label_info))
-        addActions(self.menus.video,(extract_video,extract_stream,None,batch_resize_img,merge_video))
+        addActions(self.menus.video,(extract_video,extract_stream,None,batch_resize_img,merge_video,None,annotation_video))
         addActions(self.menus.file,
                    (open, opendir, changeSavedir, openAnnotation, self.menus.recentFiles, save, save_format, saveAs, close, resetAll, quit))
         addActions(self.menus.help, (help, showInfo, None, search_system))
@@ -1575,6 +1576,7 @@ class MainWindow(QMainWindow, WindowMixin):
                      'extract_stream':self.extract_stream,'s2':self.extract_stream,
                      'batch_resize_img':self.batch_resize_img,'s3':self.batch_resize_img,
                      'merge_video':self.merge_video,'s4':self.merge_video,
+                     'annotation_video':self.annotation_video,'s5':self.annotation_video,
                      'Search_System':self.search_actions_info
                      }
         search_key='Search_System' if search_key=='' else search_key
@@ -2017,6 +2019,7 @@ class MainWindow(QMainWindow, WindowMixin):
         """merge all img in one path to one video, video will saved in img's parent path.
         for some restraint, fps must be 25, you can use 'repeat times' to repeat play img if you want slower the video.
         this action may take some time, please don't click mouse too frequently. 
+        you can press 'space' if you find bounding box not accurate during auto annotate.
         """
         try:
             img_path = QFileDialog.getExistingDirectory(self,'choose imgs folder:')
@@ -2045,6 +2048,145 @@ class MainWindow(QMainWindow, WindowMixin):
         except:
             QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
 
+    def annotation_video(self):
+        """ auto annotation video file or local camera.
+        select video file, cancle to use local camera.
+        img and xml will saved on dir of video path unless you use local camera, and folder will be './' in which case.
+        'CSRT' type means more accuracy and low speed(recommend), 'MOSSE' means high speed and low accuracy, 'KCF' is in middle.
+        frames are resized for display reason, one better run 'fix_property' after this process.
+        """
+        try:
+            tree = ET.ElementTree(file='./data/origin.xml')
+            root=tree.getroot()
+            for child in root.findall('object'):
+                template_obj=child#保存一个物体的样板
+                root.remove(child)
+            tree.write('./data/template.xml')
+            trackerType_selector={'CSRT':cv2.TrackerCSRT_create,
+                                  'BOOSTING':cv2.TrackerBoosting_create,
+                                  'MIL':cv2.TrackerMIL_create,
+                                  'KCF':cv2.TrackerKCF_create,
+                                  'TLD':cv2.TrackerTLD_create,
+                                  'MEDIANFLOW':cv2.TrackerMedianFlow_create,
+                                  'GOTURN':cv2.TrackerGOTURN_create,
+                                  'MOSSE':cv2.TrackerMOSSE_create}
+            items=tuple(trackerType_selector)
+            trackerType , ok = QInputDialog.getItem(self, "Select",
+                "Tracker type, usually 'CSRT' is ok:", items, 0, False)
+            if not ok:
+                return
+            videoPath ,_ = QFileDialog.getOpenFileName(self,"choose video file, cancle to use local camera:")
+            if not videoPath:
+                videoPath = 0
+            save_gap,ok=QInputDialog.getInt(self,'Integer input dialog','input save gap, img will saved by this frenquency :',value=25)
+            if not ok:
+                return
+            img_size,ok=QInputDialog.getInt(self,'Integer input dialog','input img size, img resized ti this shape by height:',value=900)
+            if not ok:
+                return
+            process_shape=(int(1.777*img_size),int(img_size))
+            cap = cv2.VideoCapture(videoPath)
+            ret, frame = cap.read()
+            height_K=frame.shape[0]/img_size
+            weight_K=frame.shape[1]/(1.777*img_size)
+            if not ret:
+                print('Failed to read video')
+                sys.exit(1)
+            else:
+                pass
+                frame=cv2.resize(frame,process_shape)
+            def init_multiTracker(frame):
+                bboxes = []
+                colors = []
+                labels = []
+                while True:
+                    # 在对象上绘制边界框selectROI的默认行为是从fromCenter设置为false时从中心开始绘制框，可以从左上角开始绘制框
+                    bbox = cv2.selectROI("draw ROI box and press 'ENTER' or 'SPACE' to makesure", frame)
+                    if min(bbox[2],bbox[3]) >= 10:
+                        label_name,ok=QInputDialog.getText(self, 'Text Input Dialog', 
+                        "Input label name:")
+                        if not(label_name and ok):
+                            return
+                        labels.append(label_name)
+                        bboxes.append(bbox)
+                        colors.append((random.randint(30, 240), random.randint(30, 240), random.randint(30, 240)))
+                        p1 = (int(bbox[0]), int(bbox[1]))
+                        p2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
+                        cv2.rectangle(frame, p1, p2, [10,250,10], 2, 1)
+                    else:
+                        print("bbox size small than 10, will be abandoned")
+                    print("Press q to quit selecting boxes and start tracking, Press any other key to select next object")
+                    k=cv2.waitKey(0)
+                    print(k)
+                    if k==113:
+                        break
+                print('Selected bounding boxes: {}'.format(bboxes))
+                multiTracker = cv2.MultiTracker_create()
+                # 初始化多跟踪器
+                for bbox in bboxes:
+                    tracker=trackerType_selector[trackerType]()
+                    multiTracker.add(tracker, frame, bbox)    
+                return multiTracker,colors,labels
+            multiTracker,colors,labels=init_multiTracker(frame)
+            cv2.namedWindow('MultiTracker', cv2.WINDOW_NORMAL)
+            cv2.moveWindow("MultiTracker", 10, 10)
+            # 处理视频并跟踪对象
+            index=0
+            while cap.isOpened():
+                ret, origin_frame = cap.read()
+                if not ret:
+                    break
+                frame=cv2.resize(origin_frame,process_shape)
+                draw=frame.copy()
+                ret, boxes = multiTracker.update(frame)
+                # 绘制跟踪的对象
+                for i, newbox in enumerate(boxes):
+                    p1 = (int(newbox[0]), int(newbox[1]))
+                    p2 = (int(newbox[0] + newbox[2]), int(newbox[1] + newbox[3]))
+                    cv2.rectangle(draw, p1, p2, colors[i], 2, 1)
+                    info = labels[i]
+                    t_size=cv2.getTextSize(info, cv2.FONT_HERSHEY_TRIPLEX, 0.7 , 1)[0]
+                    cv2.rectangle(draw, p1, (int(newbox[0]) + t_size[0]+3, int(newbox[1]) + t_size[1]+6), colors[i], -1)
+                    cv2.putText(draw, info, (int(newbox[0])+1, int(newbox[1])+t_size[1]+2), cv2.FONT_HERSHEY_TRIPLEX, 0.7, [255,255,255], 1)
+                # show frame
+                cv2.imshow('MultiTracker', draw)
+                # quit on ESC or Q button
+                if index%save_gap==0:
+                    tree = ET.ElementTree(file='./data/template.xml')
+                    root=tree.getroot()
+                    for i, newbox in enumerate(boxes):
+                        temp_obj=template_obj
+                        temp_obj.find('name').text=str(labels[i])
+                        temp_obj.find('bndbox').find('xmin').text=str(int(weight_K*newbox[0]))
+                        temp_obj.find('bndbox').find('ymin').text=str(int(height_K*newbox[1]))
+                        temp_obj.find('bndbox').find('xmax').text=str(int(weight_K*newbox[0]+weight_K*newbox[2]))
+                        temp_obj.find('bndbox').find('ymax').text=str(int(height_K*newbox[1]+height_K*newbox[3]))
+                        root.append(deepcopy(temp_obj))       #深度复制
+                    if videoPath==0:
+                        parent_path='./temp'
+                    else:
+                        parent_path=os.path.dirname(videoPath)
+                    os.makedirs(os.path.join(parent_path,'JPEGImages'), exist_ok=True)
+                    os.makedirs(os.path.join(parent_path,'Annotations'), exist_ok=True)
+                    cv2.imwrite(os.path.join(parent_path,'JPEGImages/','{}.jpg'.format(index)),origin_frame)
+                    tree.write(os.path.join(parent_path,'Annotations/','{}.xml'.format(index)))
+                index+=1
+                k=cv2.waitKey(1)
+                if k==32: #press space to reinit box
+                    cv2.destroyAllWindows()
+                    multiTracker,colors,labels=init_multiTracker(frame)
+                    cv2.namedWindow('MultiTracker', cv2.WINDOW_NORMAL)
+                    cv2.moveWindow("MultiTracker", 10, 10)
+                if k== 27 or k == 113: #press q or esc to quit
+                    cap.release()
+                    cv2.destroyAllWindows()
+                    break
+            cap.release()
+            cv2.destroyAllWindows()
+            QMessageBox.information(self,u'Done!',u'video auto annotation done.')
+        except:
+            QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
+    
     def change_label_name(self):
         """change label name. from 'origin' to 'target'
         you can only change one label each time, not support multi-label changing.
