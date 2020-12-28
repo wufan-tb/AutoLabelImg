@@ -2054,6 +2054,7 @@ class MainWindow(QMainWindow, WindowMixin):
         img and xml will saved on dir of video path unless you use local camera, and folder will be './' in which case.
         'CSRT' type means more accuracy and low speed(recommend), 'MOSSE' means high speed and low accuracy, 'KCF' is in middle.
         frames are resized for display reason, one better run 'fix_property' after this process.
+        press 'space' to re-drawing bounding box during annotation if you find bounding box not accurate.
         """
         try:
             tree = ET.ElementTree(file='./data/origin.xml')
@@ -2129,6 +2130,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 return multiTracker,colors,labels
             multiTracker,colors,labels=init_multiTracker(frame)
             cv2.namedWindow('MultiTracker', cv2.WINDOW_NORMAL)
+            cv2.resizeWindow("MultiTracker", process_shape[0], process_shape[1])
             cv2.moveWindow("MultiTracker", 10, 10)
             # 处理视频并跟踪对象
             index=0
@@ -2176,6 +2178,7 @@ class MainWindow(QMainWindow, WindowMixin):
                     cv2.destroyAllWindows()
                     multiTracker,colors,labels=init_multiTracker(frame)
                     cv2.namedWindow('MultiTracker', cv2.WINDOW_NORMAL)
+                    cv2.resizeWindow("MultiTracker", process_shape[0], process_shape[1])
                     cv2.moveWindow("MultiTracker", 10, 10)
                 if k== 27 or k == 113: #press q or esc to quit
                     cap.release()

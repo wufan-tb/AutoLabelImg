@@ -3,6 +3,7 @@ lxml
 keras
 natsort
 opencv-python
+opencv-contrib-python
 numpy
 pyautogui
 strsimpy
