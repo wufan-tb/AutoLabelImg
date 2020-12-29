@@ -1922,9 +1922,8 @@ class MainWindow(QMainWindow, WindowMixin):
             video_path,_ = QFileDialog.getOpenFileName(self,'choose video file:')
             if not video_path:
                 return
-            save_path=''
-            for i in range(len(video_path.split('/'))-1):
-                save_path+=(video_path.split('/')[i]+'/')
+            save_path=os.path.join(os.path.dirname(os.path.abspath(video_path)),os.path.realpath(video_path).split('.')[0])
+            os.makedirs(save_path,exist_ok=True)
             cap = cv2.VideoCapture(video_path)
             frame_gap,ok=QInputDialog.getInt(self, 'Int Input Dialog',
                 "Input frame gap, img will extract by this frequency",value=1)
@@ -1936,7 +1935,7 @@ class MainWindow(QMainWindow, WindowMixin):
                     index=int(cap.get(1))
                     if index%frame_gap!=0:
                         continue
-                    cv2.imwrite(save_path+str(int(cap.get(1)))+'.jpg',frame)
+                    cv2.imwrite(save_path+'/'+str(int(cap.get(1)))+'.jpg',frame)
                 else:
                     QMessageBox.information(self,u'Wrong!',u'extract failed.')
                     break
