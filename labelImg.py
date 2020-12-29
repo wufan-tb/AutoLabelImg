@@ -1930,7 +1930,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 "Input frame gap, img will extract by this frequency",value=1)
             if not ok:
                 return
-            while True:
+            while cap.isOpened():
                 ret, frame = cap.read()
                 if ret:
                     index=int(cap.get(1))
