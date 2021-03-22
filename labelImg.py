@@ -1623,7 +1623,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 return
             key_word = '' if key_word == '' else key_word+'_'
             for item in filelist:
-                if item.endswith('.jpg') or item.endswith('.jpeg'):
+                if item.endswith('.jpg') or item.endswith('.jpeg') or item.endswith('.png'):
                     filepath=os.path.join(os.path.abspath(path), item)
                     if Fill > 1:
                         new_item='{}{}.jpg'.format(key_word,str(index).zfill(Fill))
