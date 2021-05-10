@@ -1633,8 +1633,8 @@ class MainWindow(QMainWindow, WindowMixin):
                     os.rename(filepath,new_filepath)
                     index+=1
             QMessageBox.information(self,u'Done!',u'Batch rename done.')
-        except:
-            QMessageBox.information(self,u'Sorry!',u'something is wrong, please try again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
         
     def rename_img_xml(self):
         """batch rename img's and its corresponding xml's name. 
@@ -1681,8 +1681,8 @@ class MainWindow(QMainWindow, WindowMixin):
                 else:
                     pass
             QMessageBox.information(self,u'Done!',u'Batch rename done.')
-        except:
-            QMessageBox.information(self,u'Sorry!',u'something is wrong, please try again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
             
     def make_duplicate_xml(self):
         """copy last xml file to local img, make sure last xml exist. 
@@ -1720,8 +1720,8 @@ class MainWindow(QMainWindow, WindowMixin):
             else:
                 QMessageBox.information(self,u'Sorry!',u'please ensure the first xml file exists.')
                 return
-        except:
-            QMessageBox.information(self,u'Sorry!',u'something is wrong, try load img/xml path again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
             
     def question_1(self):
         yes, no = QMessageBox.Yes, QMessageBox.No
@@ -1846,8 +1846,8 @@ class MainWindow(QMainWindow, WindowMixin):
             imglist = os.listdir(img_folder_path)
             xmllist = os.listdir(xml_folder_path)
             QMessageBox.information(self,u'Info!',u'done, now have {} imgs, and {} xmls'.format(len(imglist),len(xmllist)))
-        except:
-            QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
         
     def show_folder_infor(self):
         """show current img folder path and xml folder path and img's number and xml's number.
@@ -1909,8 +1909,8 @@ class MainWindow(QMainWindow, WindowMixin):
                 info+='{}:  {}\n'.format(key,result[key])
             QMessageBox.information(self,u'Info',info)
             
-        except:
-            QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
     
     def extract_video(self):
         """extract imgs from video.
@@ -1940,8 +1940,8 @@ class MainWindow(QMainWindow, WindowMixin):
                     break
             cap.release()
             QMessageBox.information(self,u'Done!',u'video extract done.')
-        except:
-            QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
 
     def extract_stream(self):
         """extract imgs from stream, 'stream_path' usually start with rtsp or rtmp.
@@ -1986,8 +1986,8 @@ class MainWindow(QMainWindow, WindowMixin):
                     cap = cv2.VideoCapture(stream_path)
             cap.release()
             QMessageBox.information(self,u'Done!',u'stream extract done.')
-        except:
-            QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
            
     def batch_resize_img(self):
         """input Wdith and Height to resize all img to one shape.
@@ -2010,8 +2010,8 @@ class MainWindow(QMainWindow, WindowMixin):
                 cv2.imwrite(os.path.join(img_path,item),img)
                 
             QMessageBox.information(self,u'Done!',u'batch resize done.')
-        except:
-            QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
         
     def merge_video(self):
         """merge all img in one path to one video, video will saved in img's parent path.
@@ -2043,8 +2043,8 @@ class MainWindow(QMainWindow, WindowMixin):
 
             video.release()
             QMessageBox.information(self,u'Done!',u'video merge done.')
-        except:
-            QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
 
     def annotation_video(self):
         """ auto annotation video file or local camera.
@@ -2185,8 +2185,8 @@ class MainWindow(QMainWindow, WindowMixin):
             cap.release()
             cv2.destroyAllWindows()
             QMessageBox.information(self,u'Done!',u'video auto annotation done.')
-        except:
-            QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
     
     def change_label_name(self):
         """change label name. from 'origin' to 'target'
@@ -2226,8 +2226,8 @@ class MainWindow(QMainWindow, WindowMixin):
                         os.remove(os.path.join(os.path.abspath(xml_folder_path), item))
                         
             QMessageBox.information(self,u'Done!',u'label name changed!')
-        except:
-            QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
         
     def fix_xml_property(self):
         """fix xml's property such as size,folder,filename,path.
@@ -2263,8 +2263,8 @@ class MainWindow(QMainWindow, WindowMixin):
                             pass
                     tree.write(xmlPath)
             QMessageBox.information(self,u"Done!",u"fix xml's property done!")
-        except:
-            QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
      
     def yolov5_auto_labeling(self):
         try:
@@ -2397,8 +2397,8 @@ class MainWindow(QMainWindow, WindowMixin):
                             #!!!这块没直接append(new_obj)是因为当增加多个节点的话，new_obj会进行覆盖，必须要用深度复制以进行区分
                     tree.write(os.path.join(xml_path,path[len(os.path.dirname(path))+1:-4]+'.xml'))
             QMessageBox.information(self,u'Done!',u'auto labeling done, please reload img folder')  
-        except:
-            QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
                  
     def auto_labeling(self):
         """use model to labeling unannotated imgs.
@@ -2540,8 +2540,8 @@ class MainWindow(QMainWindow, WindowMixin):
                         #!!!这块没直接append(new_obj)是因为当增加多个节点的话，new_obj会进行覆盖，必须要用深度复制以进行区分
                 tree.write(xml_path+'/'+image_names[i][0:-4]+'.xml')
             QMessageBox.information(self,u'Done!',u'auto labeling done, please reload img folder')
-        except:
-            QMessageBox.information(self,u'Wrong!',u'something wrong, please check again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
         
     def data_auto_agument(self):
         """data agument, using Affine change, intensity change, contrast change, gama change, Gaussian fillter to agument img data.
@@ -2592,8 +2592,8 @@ class MainWindow(QMainWindow, WindowMixin):
                     progress.setValue(100)
                     QMessageBox.information(self,"Done","data agument scuesseed！")
             
-        except:
-            QMessageBox.information(self,u'Wrong!',u'something is wrong, try load img/xml path again.')
+        except Exception as e:
+            QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
             
     def agument_A(self,imglist,xmllist,progress):
         print('agmt:',len(imglist))
