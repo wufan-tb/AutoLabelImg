@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import codecs,os,sys,platform,subprocess,random,natsort,datetime,cv2
+import codecs,os,sys,platform,subprocess,random,natsort,cv2,easygui
 import xml.etree.ElementTree as ET
 from copy import deepcopy
 from strsimpy.jaro_winkler import JaroWinkler
@@ -2328,32 +2328,45 @@ class MainWindow(QMainWindow, WindowMixin):
                     weights=os.path.join(weight_path,weights)
             else:
                 weights,_ = QFileDialog.getOpenFileName(self,"'pytorch_yolov5/weights' is empty, choose model weights file:")
-                if not (weights.endswith('.h5') or weights.endswith('.pt') or weights.endswith('.pth')):
+                if not (weights.endswith('.pt') or weights.endswith('.pth')):
                     QMessageBox.information(self,u'Wrong!',u'weights file must endswith .h5 or .pt or .pth')
                     return
-            imgsz,OK=QInputDialog.getInt(self,'Integer input dialog','input img size(k*32):',value=320)
-            if not OK:
-                return
             conf_thres=0.5
             iou_thres=0.5
             # Initialize
-            device = torch_utils.select_device('')
+            device = torch_utils.select_device('0')
             half = device.type != 'cpu'  # half precision only supported on CUDA
 
-            # Load model
+            # Load model and label name.
             model = attempt_load(weights, map_location=device)  # load FP32 model
+            names = model.module.names if hasattr(model, 'module') else model.names
+            needed_labels=easygui.multchoicebox(msg="select labels you want auto-labeing?",title="Setect labels",choices=tuple(names))
+            # set imsize
+            imgsz,OK=QInputDialog.getInt(self,'Integer input dialog','input img size(k*32):',value=640)
+            if not OK:
+                return
             imgsz = check_img_size(imgsz, s=model.stride.max())  # check img_size
             if half:
                 model.half()  # to FP16
+            
+            # load img and run inference
             dataset = LoadImages(source, img_size=imgsz)
-
-            # Get names and colors
-            names = model.module.names if hasattr(model, 'module') else model.names
-            # Run inference
-            t0 = time.time()
+            progress = QProgressDialog(self)
+            progress.setWindowTitle(u"Waiting")  
+            progress.setLabelText(u"auto-labeling with yolov5 now,Please wait...")
+            progress.setCancelButtonText(u"Cancle it")
+            progress.setMinimumDuration(1)
+            progress.setWindowModality(Qt.WindowModal)
+            progress.setRange(0,100)   
             img = torch.zeros((1, 3, imgsz, imgsz), device=device)  # init img
             _ = model(img.half() if half else img) if device.type != 'cpu' else None  # run once
+            index=-1
             for path, img, im0s, vid_cap in dataset:
+                index+=1
+                progress.setValue(int(100*index/len(dataset)))
+                if progress.wasCanceled():
+                    QMessageBox.warning(self,"Attention","auto-labeling canceled！") 
+                    return
                 img = torch.from_numpy(img).to(device)
                 img = img.half() if half else img.float()  # uint8 to fp16/32
                 img /= 255.0  # 0 - 255 to 0.0 - 1.0
@@ -2361,7 +2374,6 @@ class MainWindow(QMainWindow, WindowMixin):
                     img = img.unsqueeze(0)
 
                 # Inference
-                t1 = torch_utils.time_synchronized()
                 pred = model(img, augment=False)[0]
 
                 # Apply NMS
@@ -2385,6 +2397,8 @@ class MainWindow(QMainWindow, WindowMixin):
                             s += '%g %ss, ' % (n, names[int(c)])  # add to string
                         # Write results
                         for *xyxy, conf, cls in det:
+                            if names[int(cls)] not in needed_labels:
+                                continue
                             labels.append(names[int(cls)])
                             scores.append(conf.item())
                             boxes.append([int(xyxy[0].item()),int(xyxy[1].item()),int(xyxy[2].item()),int(xyxy[3].item())])
@@ -2402,6 +2416,7 @@ class MainWindow(QMainWindow, WindowMixin):
                             root.append(deepcopy(new_obj))       #深度复制
                             #!!!这块没直接append(new_obj)是因为当增加多个节点的话，new_obj会进行覆盖，必须要用深度复制以进行区分
                     tree.write(os.path.join(xml_path,path[len(os.path.dirname(path))+1:-4]+'.xml'))
+            progress.setValue(100)
             QMessageBox.information(self,u'Done!',u'auto labeling done, please reload img folder')  
         except Exception as e:
             QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
@@ -2420,15 +2435,12 @@ class MainWindow(QMainWindow, WindowMixin):
             return
         try:       
             #=====choose model and input label name=====
-            items = ("Yolov5","Retinanet")
-            model_type, ok = QInputDialog.getItem(self, "Select","Model type:", items, 0, False)
-            if not ok:
-                return
-            if model_type=="Yolov5":
-                with torch.no_grad():
-                    self.yolov5_auto_labeling()
-                return
-                    
+            # using yolov5 autolabeling   
+            with torch.no_grad():
+                self.yolov5_auto_labeling()
+            return
+            # using retinanet autolabeling, not recommended.
+            """   
             from keras_retinanet import models
             from keras_retinanet.utils.image import preprocess_image, resize_image
             from keras_retinanet.utils.visualization import remove_certain_label,transform_box
@@ -2546,6 +2558,7 @@ class MainWindow(QMainWindow, WindowMixin):
                         #!!!这块没直接append(new_obj)是因为当增加多个节点的话，new_obj会进行覆盖，必须要用深度复制以进行区分
                 tree.write(xml_path+'/'+image_names[i][0:-4]+'.xml')
             QMessageBox.information(self,u'Done!',u'auto labeling done, please reload img folder')
+            """
         except Exception as e:
             QMessageBox.information(self,u'Sorry!',u'something is wrong. ({})'.format(e))
         
@@ -2565,7 +2578,6 @@ class MainWindow(QMainWindow, WindowMixin):
                 return 
             else:
                 magnification,OK=QInputDialog.getInt(self,'Integer input dialog','input agument magnification(1~4):',value=4)
-                print(magnification,OK)
                 if OK:
                     if magnification<1 or magnification>4:
                         magnification=4
@@ -2583,7 +2595,7 @@ class MainWindow(QMainWindow, WindowMixin):
                     progress.setWindowTitle(u"Waiting")  
                     progress.setLabelText(u"Processing now,Please wait...")
                     progress.setCancelButtonText(u"Cancle data agument")
-                    progress.setMinimumDuration(5)
+                    progress.setMinimumDuration(1)
                     progress.setWindowModality(Qt.WindowModal)
                     progress.setRange(0,100) 
                     
