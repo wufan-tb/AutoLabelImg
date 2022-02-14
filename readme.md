@@ -2,7 +2,7 @@
 
 ### 简介：
 
-在[labelImg](https://github.com/tzutalin/labelImg)的基础上，增加了多种标注工具，放在Annoatate-tools和Video-tools两个菜单栏下面。具体功能包含如下：
+在[labelImg](https://github.com/tzutalin/labelImg)的基础上，增加了多种标注工具，放在**Annoatate-tools**和**Video-tools**两个菜单栏下面。具体功能包含如下：
 
 - **`TOOL LIST`**：
 - [x] **自动标注**：基于yolov5的模型自动标注
@@ -83,7 +83,7 @@ exit
 
 双击labelImg.bat即可打开标注软件。
 
-**Linux:**
+**Ubuntu:**
 
 打开环境变量文件：
 
