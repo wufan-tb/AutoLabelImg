@@ -1,7 +1,7 @@
-opencv-python==4.1.1.26
-opencv-contrib-python==4.1.1.26
 pyqt5==5.14.1
 lxml==4.6.5
+opencv-python
+opencv-contrib-python
 natsort
 strsimpy
 easygui
