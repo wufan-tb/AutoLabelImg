@@ -7,6 +7,7 @@ from strsimpy.jaro_winkler import JaroWinkler
 import numpy as np
 from skimage import exposure
 from functools import partial
+
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -16,7 +17,7 @@ from models.experimental import *
 from utils.datasets import *
 from utils.utils import *
 
-from combobox import ComboBox
+from libs.combobox import ComboBox
 from libs.resources import *
 from libs.constants import *
 from libs.utils import *
