@@ -76,7 +76,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.defaultSaveDir = defaultSaveDir
         self.usingPascalVocFormat = True
         self.usingYoloFormat = False
-        
+
         #define global path for myown use
         self.img_folder_path=''
         self.xml_folder_path=''
@@ -381,6 +381,9 @@ class MainWindow(QMainWindow, WindowMixin):
             labelList=labelMenu)
 
         # Auto saving : Enable auto saving if pressing next
+        self.useMagnifyingLens = QAction('Magnifying Lens', self)
+        self.useMagnifyingLens.setCheckable(True)
+        self.useMagnifyingLens.setChecked(settings.get(SETTING_Magnifying_Lens, False))
         self.autoSaving = QAction(getStr('autoSaveMode'), self)
         self.autoSaving.setCheckable(True)
         self.autoSaving.setChecked(settings.get(SETTING_AUTO_SAVE, False))
@@ -408,6 +411,7 @@ class MainWindow(QMainWindow, WindowMixin):
                    (open, opendir, changeSavedir, openAnnotation, self.menus.recentFiles, save, save_format, saveAs, close, resetAll, quit))
         addActions(self.menus.help, (help, showInfo, None, search_system))
         addActions(self.menus.view, (
+            self.useMagnifyingLens,
             self.autoSaving,
             self.singleClassMode,
             self.displayLabelOption,
@@ -1180,6 +1184,7 @@ class MainWindow(QMainWindow, WindowMixin):
         settings[SETTING_SINGLE_CLASS] = self.singleClassMode.isChecked()
         settings[SETTING_PAINT_LABEL] = self.displayLabelOption.isChecked()
         settings[SETTING_DRAW_SQUARE] = self.drawSquaresOption.isChecked()
+        settings[SETTING_Magnifying_Lens] = self.useMagnifyingLens.isChecked()
         settings.save()
 
     def loadRecent(self, filename):

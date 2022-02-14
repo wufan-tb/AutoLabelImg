@@ -110,21 +110,39 @@ class Canvas(QWidget):
         img = pyautogui.screenshot(region=[x-half_size,y-half_size,box_size,box_size])
         img=cv2.cvtColor(np.asarray(img),cv2.COLOR_BGR2RGB)
         cv_img=cv2.resize(img, (int(enlarge_ratio*box_size), int(enlarge_ratio*box_size)), interpolation=cv2.INTER_CUBIC)
-        cv_img=cv2.line(cv_img, (int(enlarge_ratio*half_size),0), (int(enlarge_ratio*half_size),int(enlarge_ratio*box_size)), [0,255,0], 2, 4)
-        cv_img=cv2.line(cv_img, (0,int(enlarge_ratio*half_size)), (int(enlarge_ratio*box_size),int(enlarge_ratio*half_size)), [0,255,0], 2, 4)
         cv_img=cv2.cvtColor(cv_img,cv2.COLOR_BGR2RGB)
         img=QImage(cv_img[:],cv_img.shape[1], cv_img.shape[0],cv_img.shape[1] * 3, QImage.Format_RGB888)
         img=QPixmap.fromImage(img)
         return img
+    
+    def get_mouse_area(self,pos,np_img,area_size=60,ratio=5):
+        xmin=int(max(0,pos.x()-area_size))
+        xmax=int(min(np_img.shape[1],pos.x()+area_size))
+        ymin=int(max(0,pos.y()-area_size))
+        ymax=int(min(np_img.shape[0],pos.y()+area_size))
+        np_img=np_img[ymin:ymax,xmin:xmax,:]
+        enlargesize=int(ratio*area_size)
+        np_img=cv2.resize(np_img, (enlargesize, enlargesize), interpolation=cv2.INTER_CUBIC)
+        np_img=cv2.cvtColor(np_img,cv2.COLOR_BGR2RGB)
+        cv2.line(np_img, (0, enlargesize//2), (enlargesize, enlargesize//2), (0, 255, 0))
+        cv2.line(np_img, (enlargesize//2,0), (enlargesize//2, enlargesize), (0, 255, 0))  
+        qimg=QImage(np_img[:],np_img.shape[1], np_img.shape[0],np_img.shape[1] * 3, QImage.Format_RGB888)
+        qimg=QPixmap.fromImage(qimg)
+        return qimg
         
     def mouseMoveEvent(self, ev):
         """Update line with last point and current coordinates."""
         pos = self.transformPos(ev.pos())
-
         # Update coordinates in status bar if image is opened
         window = self.parent().window()
-        # img=self.get_mouse_img()
-        # window.new_test.setPixmap(img)  #注释这两行取消放大功能
+        if window.useMagnifyingLens.isChecked() and window.filePath:
+            # image=window.image 
+            try:
+                img=cv2.imread(window.filePath)
+                img=self.get_mouse_area(pos,img)
+                window.new_test.setPixmap(img) 
+            except:
+                pass
         
         if window.filePath is not None:
             self.parent().window().labelCoordinates.setText(
