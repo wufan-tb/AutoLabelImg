@@ -1,41 +1,53 @@
-# AutoLabelImg 多功能自动标注工具
+# AutoLabelImg：MultiFunction AutoAnnotate Tools
 
 ### [<u>English</u>](./readme.md)    |    [<u>中文</u>](./readme.md)
 
-### 简介：
+### Introduction：
 
-在[labelImg](https://github.com/tzutalin/labelImg)的基础上，增加了多种标注工具，放在**Annoatate-tools**和**Video-tools**两个菜单栏下面。具体功能包含如下：
+Based on [labelImg](https://github.com/tzutalin/labelImg), we add many useful annotate tools, in **Annoatate-tools** and **Video-tools** menu, including：
 
 - **`TOOL LIST`**：
-- [x] **自动标注**：基于yolov5的模型自动标注
-- [x] **追踪标注**：利用opencv的追踪功能，自动标注视频数据
-- [x] **放大镜**：局部放大，对小目标的标注有帮助，可以关闭
-- [x] **数据增强**：随机使用平移，翻转，缩放，亮度，gama，模糊等手段增强图片
-- [x] **查询系统**：输入关键字获得详细说明信息
-- [x] 其他辅助工具：类别筛选/重命名/统计、标注文件属性校正、视频提取/合成、图片重命名等，可以利用查询系统查看详细信息，欢迎体验
+- [x] **Auto Annotate**：anto annotate images using yolov5 detector
+- [x] **Tracking Annotate**：using tracking method in opencv, annotate video data
+- [x] **Magnifing Lens**：helpful when annotating small objects, optional function
+- [x] **Data Agument**：data agument
+- [x] **Search System**：search details info based on your input
+- [x] other tools：label selecting/rename/counting, fix annotation, video merge/extract, welcome to try
 
 ### Demo:
 
-### 更新日志：
+seen in Vtuber:
 
-2022.01.14：自动标注去掉Retinanet，仅保留yolov5，并增加标签选择
+[Auto Annotate](https://www.bilibili.com/video/BV1Uu411Q7WW/)
 
-2022.01.11：优化放大镜卡顿现象，增加放大镜可关闭选项
+[Tracking Annotate](https://www.bilibili.com/video/BV1XT4y1X7At/)
 
-2020.12.28：增加视频追踪标注工具
+[Magnifing Lens](https://www.bilibili.com/video/BV1nL4y1G7qm/)
 
-2020.12.10：初步把所有工具加进labelimg，版本1.0
+[Data Augment](https://www.bilibili.com/video/BV1Vu411R7Km/)
 
-## 安装步骤：
+[Search System](https://www.bilibili.com/video/BV1ZL4y137ar/)
 
-1. 复制仓库：
+### Update log：
+
+2022.01.14：remove Retinanet( matain yolov5 only), and add label selecting when autolabeling
+
+2022.01.11：imporve magnifing lens, more fluent and can be shut
+
+2020.12.28：add video tracking annotate
+
+2020.12.10：autolabelimg，version 1.0
+
+## Installation：
+
+1. clone this repo：
 
    ```bash
    git clone https://github.com/wufan-tb/AutoLabelImg
    cd AutoLabelImg
    ```
 
-2. 安装依赖：
+2. install requirments：
 
    ```bash
    conda create -n {your_env_name} python=3.7.6
@@ -43,38 +55,38 @@
    pip install requirements.txt
    ```
 
-3. 源码编译：
+3. compile source code：
 
-   **Ubuntu用户:**
+   **Ubuntu User:**
    
    ```
    sudo apt-get install pyqt5-dev-tools
    make qt5py3
    ```
    
-   **Windows用户:**
+   **Windows User:**
    
    ```
    pyrcc5 -o libs/resources.py resources.qrc
    ```
    
-4. 准备yolov5模型并放置在如下位置，官方模型获取参考[Yolov5](https://github.com/ultralytics/yolov5)
+4. prepare yolov5 weights file and move them to here: [official model zoo:[Yolov5](https://github.com/ultralytics/yolov5)]
 
    ```bash
    mv {your_model_weight.pt} pytorch_yolov5/weights/
    ```
 
-5. 打开软件，开始标注
+5. open labelimg software
 
    ```
    python labelImg.py
    ```
 
-## 设置快捷方式[非必须]
+## Set shortcut to open software[optional]
 
-**Windows用户:**
+**Windows User:**
 
-桌面创建labelImg.bat,右键用文本编辑器打开，键入下面内容(不一定是D盘，根据实际输入)：
+create a file:labelImg.bat, open it and type these text(D disk as an example)：
 
 ```bash
 D:
@@ -83,31 +95,31 @@ start python labelImg.py
 exit
 ```
 
-双击labelImg.bat即可打开标注软件。
+double click labelImg.bat to open the software.
 
-**Ubuntu用户:**
+**Ubuntu User:**
 
-打开环境变量文件：
+open environment setting file: 
 
 ```bash
 vim ~/.bashrc
 ```
 
-然后增加下面内容：
+add this command：
 
 ```bash
 alias labelimg='cd {path to your labelImg folder} && python labelImg.py
 ```
 
-使环境变量生效：
+source it：
 
 ```bash
 source ~/.bashrc
 ```
 
-然后在任何地方输入指令labelimg即可打开编著软件。
+typing labeling in terminal to open the software.
 
-## 引用
+## Citation
 
 ```
 {   AutoLabelImg,
