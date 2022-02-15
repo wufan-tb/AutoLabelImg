@@ -52,7 +52,7 @@
    ```bash
    conda create -n {your_env_name} python=3.7.6
    conda activate {your_env_name}
-   pip install requirements.txt
+   pip install -r requirements.txt
    ```
 
 3. 源码编译：
