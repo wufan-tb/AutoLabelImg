@@ -1,6 +1,6 @@
 # AutoLabelImg 多功能自动标注工具
 
-### [<u>English</u>](./readme.md)   [<u>中文</u>](./readme.md)
+### [<u>English</u>](./readme.md)    |    [<u>中文</u>](./readme.md)
 
 ### 简介：
 
