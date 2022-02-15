@@ -117,7 +117,7 @@ alias labelimg='cd {path to your labelImg folder} && python labelImg.py
 source ~/.bashrc
 ```
 
-然后在任何地方输入指令labelimg即可打开编著软件。
+然后在终端输入指令'labelimg'即可打开编著软件。
 
 ## 引用
 

@@ -1,6 +1,6 @@
 # AutoLabelImg：MultiFunction AutoAnnotate Tools
 
-### [<u>English</u>](./readme.md)    |    [<u>中文</u>](./readme.md)
+### [<u>English</u>](./readme.md)    |    [<u>中文</u>](./readme_CN.md)
 
 ### Introduction：
 
@@ -117,7 +117,7 @@ source it：
 source ~/.bashrc
 ```
 
-typing labeling in terminal to open the software.
+typing 'labeling' in terminal to open the software.
 
 ## Citation
 
