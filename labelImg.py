@@ -37,7 +37,7 @@ from libs.yolo_io import TXT_EXT
 from libs.ustr import ustr
 from libs.hashableQListWidgetItem import HashableQListWidgetItem
 
-__appname__ = 'Advanced_LabelImg  '
+__appname__ = 'AutoLabelImg  '
 
 class WindowMixin(object):
 
@@ -2106,7 +2106,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 labels = []
                 while True:
                     # 在对象上绘制边界框selectROI的默认行为是从fromCenter设置为false时从中心开始绘制框，可以从左上角开始绘制框
-                    bbox = cv2.selectROI("draw ROI box and press 'ENTER' or 'SPACE' to makesure", frame)
+                    bbox = cv2.selectROI("draw box and press 'SPACE' to affirm, Press 'q' to quit draw box and start tracking-labeling", frame)
                     if min(bbox[2],bbox[3]) >= 10:
                         label_name,ok=QInputDialog.getText(self, 'Text Input Dialog', 
                         "Input label name:")
@@ -2120,7 +2120,6 @@ class MainWindow(QMainWindow, WindowMixin):
                         cv2.rectangle(frame, p1, p2, [10,250,10], 2, 1)
                     else:
                         print("bbox size small than 10, will be abandoned")
-                    print("Press q to quit selecting boxes and start tracking, Press any other key to select next object")
                     k=cv2.waitKey(0)
                     print(k)
                     if k==113:
@@ -2155,7 +2154,7 @@ class MainWindow(QMainWindow, WindowMixin):
                     cv2.rectangle(draw, p1, (int(newbox[0]) + t_size[0]+3, int(newbox[1]) + t_size[1]+6), colors[i], -1)
                     cv2.putText(draw, info, (int(newbox[0])+1, int(newbox[1])+t_size[1]+2), cv2.FONT_HERSHEY_TRIPLEX, 0.7, [255,255,255], 1)
                 # show frame
-                cv2.imshow('MultiTracker', draw)
+                cv2.imshow("MultiTracker, press 'SPACE' to redraw box, press 'q' to quit video labeling", draw)
                 # quit on ESC or Q button
                 if index%save_gap==0:
                     tree = ET.ElementTree(file='./data/template.xml')

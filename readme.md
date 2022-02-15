@@ -1,5 +1,7 @@
 # AutoLabelImg 多功能自动标注工具
 
+### [<u>English</u>](./readme.md)   [<u>中文</u>](./readme.md)
+
 ### 简介：
 
 在[labelImg](https://github.com/tzutalin/labelImg)的基础上，增加了多种标注工具，放在**Annoatate-tools**和**Video-tools**两个菜单栏下面。具体功能包含如下：
@@ -10,7 +12,7 @@
 - [x] **放大镜**：局部放大，对小目标的标注有帮助，可以关闭
 - [x] **数据增强**：随机使用平移，翻转，缩放，亮度，gama，模糊等手段增强图片
 - [x] **查询系统**：输入关键字获得详细说明信息
-- [x] 其他批量处理功能：可以利用查询系统查看详细信息，欢迎体验
+- [x] 其他辅助工具：类别筛选/重命名/统计、标注文件属性校正、视频提取/合成、图片重命名等，可以利用查询系统查看详细信息，欢迎体验
 
 ### Demo:
 
@@ -70,7 +72,7 @@
 
 ## 设置快捷方式[非必须]
 
-**Windows:**
+**Windows用户:**
 
 桌面创建labelImg.bat,右键用文本编辑器打开，键入下面内容(不一定是D盘，根据实际输入)：
 
@@ -83,7 +85,7 @@ exit
 
 双击labelImg.bat即可打开标注软件。
 
-**Ubuntu:**
+**Ubuntu用户:**
 
 打开环境变量文件：
 
@@ -110,7 +112,7 @@ source ~/.bashrc
 ```
 {   AutoLabelImg,
     author = {Wu Fan},
-    year = {2022},
+    year = {2020},
     url = {\url{https://https://github.com/wufan-tb/AutoLabelImg}}
 }
 ```

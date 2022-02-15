@@ -21,3 +21,6 @@ cscope*
 *.pth
 *.git
 temp*
+
+*.mp4
+*.jpg
