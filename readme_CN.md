@@ -2,6 +2,8 @@
 
 ### [<u>English</u>](./readme.md)    |    [<u>中文</u>](./readme_CN.md)
 
+![AutoLabelImg](./demo/demo.png)
+
 ### 简介：
 
 在[labelImg](https://github.com/tzutalin/labelImg)的基础上，增加了多种标注工具，放在**Annoatate-tools**和**Video-tools**两个菜单栏下面。具体功能包含如下：

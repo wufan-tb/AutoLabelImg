@@ -2,6 +2,8 @@
 
 ### [<u>English</u>](./readme.md)    |    [<u>中文</u>](./readme_CN.md)
 
+![AutoLabelImg](./demo/demo.png)
+
 ### Introduction：
 
 Based on [labelImg](https://github.com/tzutalin/labelImg), we add many useful annotate tools, in **Annoatate-tools** and **Video-tools** menu, including：
