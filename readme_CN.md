@@ -95,7 +95,7 @@ start python labelImg.py
 exit
 ```
 
-下面是实际例子，根据自己的实际路径修改第一二行即可：
+下面是一个实际案例，根据自己的实际路径修改第一二行即可：
 
 ```
 D:
@@ -126,7 +126,7 @@ alias labelimg='cd {path to your labelImg folder} && python labelImg.py
 source ~/.bashrc
 ```
 
-然后在终端输入指令'labelimg'即可打开编著软件。
+然后在终端输入指令'labelimg'即可打开标注软件。
 
 ## 引用
 
