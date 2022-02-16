@@ -86,11 +86,20 @@
 
 **Windows用户:**
 
-桌面创建labelImg.bat,右键用文本编辑器打开，键入下面内容(不一定是D盘，根据实际输入)：
+桌面创建labelImg.bat（可以新建文本文件，然后把后缀.txt改成.bat）,右键用文本编辑器打开，键入下面内容(不一定是D盘，根据实际输入)：
 
 ```bash
 D:
 cd D:{path to your labelImg folder}
+start python labelImg.py
+exit
+```
+
+下面是实际例子，根据自己的实际路径修改第一二行即可：
+
+```
+D:
+cd D:\_project\AutoLabelImg
 start python labelImg.py
 exit
 ```
