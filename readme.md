@@ -1,8 +1,8 @@
 # AutoLabelImg：MultiFunction AutoAnnotate Tools
 
-### [<u>English</u>](./readme.md)    |    [<u>中文</u>](./readme_CN.md)
-
 ![AutoLabelImg](./demo/demo.png)
+
+### [<u>English</u>](./readme.md)    |    [<u>中文</u>](./readme_CN.md)
 
 ### Introduction：
 
