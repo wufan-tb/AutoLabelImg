@@ -22,6 +22,10 @@ class Detect(nn.Module):
     def forward(self, x):
         # x = x.copy()  # for profiling
         z = []  # inference output
+
+        if not hasattr(self, 'export'):
+            self.export = False
+
         self.training |= self.export
         for i in range(self.nl):
             x[i] = self.m[i](x[i])  # conv
