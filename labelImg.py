@@ -2339,7 +2339,10 @@ class MainWindow(QMainWindow, WindowMixin):
             # Load model and label name.
             model = attempt_load(weights, map_location=device)  # load FP32 model
             names = model.module.names if hasattr(model, 'module') else model.names
-            needed_labels=easygui.multchoicebox(msg="select labels you want auto-labeing?",title="Setect labels",choices=tuple(names))
+            if len(names)== 1:
+                needed_labels=names[0]
+            else:
+                needed_labels=easygui.multchoicebox(msg="select labels you want auto-labeing?",title="Setect labels",choices=tuple(names,))
             # set imsize
             imgsz,OK=QInputDialog.getInt(self,'Integer input dialog','input img size(k*32):',value=640)
             if not OK:
