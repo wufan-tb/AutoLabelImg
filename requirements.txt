@@ -6,6 +6,6 @@ pyqt5>=5.14.1
 lxml>=4.6.5
 opencv-python>=4.1.1.26
 opencv-contrib-python>=4.1.1.26
-torch==1.6.0
+torch==1.13.1
 torchvision==0.7.0
 
